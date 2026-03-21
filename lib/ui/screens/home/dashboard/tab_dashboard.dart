@@ -98,9 +98,6 @@ class TabDashboard extends ConsumerWidget {
 
               /// Restrictions
               ..._restrictions(context),
-
-              /// Productivity
-              ..._productivity(context),
             ].animateListOnce(
               ref: ref,
               uniqueKey: "home.dashboard",
@@ -167,50 +164,6 @@ class TabDashboard extends ConsumerWidget {
           trailing: const Icon(FluentIcons.chevron_right_20_regular),
           onPressed: () =>
               Navigator.of(context).pushNamed(AppRoutes.websitesBlockingPath),
-        ),
-      ];
-
-  static List<Widget> _productivity(BuildContext context) => [
-        /// Productivity
-        const ContentSectionHeader(title: "Productivity"),
-
-        /// Habits
-        DefaultListTile(
-          position: ItemPosition.top,
-          leadingIcon: FluentIcons.drink_coffee_20_regular,
-          titleText: "Habits",
-          subtitleText: "Build better habits and track them.",
-          trailing: const Icon(FluentIcons.chevron_right_20_regular),
-          onPressed: () => context.showSnackAlert(
-            "Coming soon...",
-            icon: FluentIcons.info_20_filled,
-          ),
-        ),
-
-        /// Tasks and todos
-        DefaultListTile(
-          position: ItemPosition.mid,
-          leadingIcon: FluentIcons.reading_list_20_regular,
-          titleText: "Tasks and todos",
-          subtitleText: "Plan your future with tasks and todos.",
-          trailing: const Icon(FluentIcons.chevron_right_20_regular),
-          onPressed: () => context.showSnackAlert(
-            "Coming soon...",
-            icon: FluentIcons.info_20_filled,
-          ),
-        ),
-
-        /// Notes & lists
-        DefaultListTile(
-          position: ItemPosition.bottom,
-          leadingIcon: FluentIcons.note_20_regular,
-          titleText: "Notes and lists",
-          subtitleText: "Capture thoughts, checklists, or ideas.",
-          trailing: const Icon(FluentIcons.chevron_right_20_regular),
-          onPressed: () => context.showSnackAlert(
-            "Coming soon...",
-            icon: FluentIcons.info_20_filled,
-          ),
         ),
       ];
 }
