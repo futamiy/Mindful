@@ -39,8 +39,10 @@ import java.util.Date
 object AlarmTasksSchedulingHelper {
     private const val TAG = "Mindful.AlarmTasksSchedulingHelper"
     private const val MIDNIGHT_RESET_ALARM_ID = 101
-    private const val BEDTIME_ROUTINE_ALARM_ID = 102
-    private const val NOTIFICATION_BATCH_ALARM_ID = 103
+    private const val BEDTIME_ROUTINE_ALERT_ALARM_ID = 102
+    private const val BEDTIME_ROUTINE_START_ALARM_ID = 103
+    private const val BEDTIME_ROUTINE_STOP_ALARM_ID = 104
+    private const val NOTIFICATION_BATCH_ALARM_ID = 105
 
 
     /**
@@ -120,7 +122,7 @@ object AlarmTasksSchedulingHelper {
                 receiverClass = BedtimeRoutineReceiver::class.java,
                 intentAction = BedtimeRoutineReceiver.ACTION_ALERT_BEDTIME,
                 epochTimeMs = alertTimeMs,
-                requestCode = BEDTIME_ROUTINE_ALARM_ID,
+                requestCode = BEDTIME_ROUTINE_ALERT_ALARM_ID,
                 extraMap = extraMap,
             )
         }
@@ -131,7 +133,7 @@ object AlarmTasksSchedulingHelper {
             receiverClass = BedtimeRoutineReceiver::class.java,
             intentAction = BedtimeRoutineReceiver.ACTION_START_BEDTIME,
             epochTimeMs = startTimeMs,
-            requestCode = BEDTIME_ROUTINE_ALARM_ID,
+            requestCode = BEDTIME_ROUTINE_START_ALARM_ID,
             extraMap = extraMap,
         )
         scheduleOrUpdateExactAlarmTask(
@@ -139,7 +141,7 @@ object AlarmTasksSchedulingHelper {
             receiverClass = BedtimeRoutineReceiver::class.java,
             intentAction = BedtimeRoutineReceiver.ACTION_STOP_BEDTIME,
             epochTimeMs = endTimeMs,
-            requestCode = BEDTIME_ROUTINE_ALARM_ID,
+            requestCode = BEDTIME_ROUTINE_STOP_ALARM_ID,
             extraMap = extraMap,
         )
         Log.d(
@@ -160,15 +162,23 @@ object AlarmTasksSchedulingHelper {
      */
     fun cancelBedtimeRoutineTasks(context: Context) {
         // Cancel the alarms
-        cancelExactAlarmTasks(
+        cancelExactAlarmTask(
             context = context,
             receiverClass = BedtimeRoutineReceiver::class.java,
-            requestCode = BEDTIME_ROUTINE_ALARM_ID,
-            intentActions = listOf(
-                BedtimeRoutineReceiver.ACTION_ALERT_BEDTIME,
-                BedtimeRoutineReceiver.ACTION_START_BEDTIME,
-                BedtimeRoutineReceiver.ACTION_STOP_BEDTIME
-            ),
+            requestCode = BEDTIME_ROUTINE_ALERT_ALARM_ID,
+            intentAction = BedtimeRoutineReceiver.ACTION_ALERT_BEDTIME,
+        )
+        cancelExactAlarmTask(
+            context = context,
+            receiverClass = BedtimeRoutineReceiver::class.java,
+            requestCode = BEDTIME_ROUTINE_START_ALARM_ID,
+            intentAction = BedtimeRoutineReceiver.ACTION_START_BEDTIME,
+        )
+        cancelExactAlarmTask(
+            context = context,
+            receiverClass = BedtimeRoutineReceiver::class.java,
+            requestCode = BEDTIME_ROUTINE_STOP_ALARM_ID,
+            intentAction = BedtimeRoutineReceiver.ACTION_STOP_BEDTIME,
         )
 
         // Let service know
@@ -238,11 +248,11 @@ object AlarmTasksSchedulingHelper {
      * @param context The application context.
      */
     fun cancelNotificationBatchTask(context: Context) {
-        cancelExactAlarmTasks(
+        cancelExactAlarmTask(
             context = context,
             receiverClass = NotificationBatchWorker::class.java,
             requestCode = NOTIFICATION_BATCH_ALARM_ID,
-            intentActions = listOf(NotificationBatchReceiver.ACTION_PUSH_BATCH)
+            intentAction = NotificationBatchReceiver.ACTION_PUSH_BATCH
         )
         Log.d(TAG, "cancelNotificationBatchTask: Notification batch tasks cancelled successfully")
     }
@@ -287,6 +297,13 @@ object AlarmTasksSchedulingHelper {
                     epochTimeMs,
                     pendingIntent
                 )
+            } else {
+                // Fallback to inexact alarm if permission is missing
+                alarmManager.setAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    epochTimeMs,
+                    pendingIntent
+                )
             }
         } else {
             alarmManager.setExactAndAllowWhileIdle(
@@ -298,29 +315,27 @@ object AlarmTasksSchedulingHelper {
     }
 
     /**
-     * Cancels all the exact alarm task related to the service class and the list of actions.
+     * Cancels the exact alarm task related to the service class and the action.
      *
      * @param context       The application context.
      * @param receiverClass The receiver class for the alarm.
-     * @param intentActions The list of actions to be set on the intents.
+     * @param requestCode   The request code used for scheduling the alarm.
+     * @param intentAction  The action set on the intent.
      */
-    private fun cancelExactAlarmTasks(
+    private fun cancelExactAlarmTask(
         context: Context,
         receiverClass: Class<*>,
         requestCode: Int,
-        intentActions: List<String>,
+        intentAction: String,
     ) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-        for (action in intentActions) {
-            val intent = Intent(context.applicationContext, receiverClass).setAction(action)
-            val pendingIntent = PendingIntent.getBroadcast(
-                context,
-                requestCode,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-            alarmManager.cancel(pendingIntent)
-        }
+        val intent = Intent(context.applicationContext, receiverClass).setAction(intentAction)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager.cancel(pendingIntent)
     }
 }

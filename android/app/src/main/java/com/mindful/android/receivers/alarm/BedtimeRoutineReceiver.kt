@@ -49,9 +49,7 @@ class BedtimeRoutineReceiver : BroadcastReceiver() {
         when (intent.action) {
             ACTION_ALERT_BEDTIME, ACTION_START_BEDTIME, ACTION_STOP_BEDTIME -> {
                 /// Schedule worker
-                WorkManager.getInstance(context).enqueueUniqueWork(
-                    TAG,
-                    ExistingWorkPolicy.KEEP,
+                WorkManager.getInstance(context).enqueue(
                     OneTimeWorkRequest.Builder(BedtimeRoutineWorker::class.java)
                         .setInputData(
                             Data.Builder()
@@ -95,12 +93,10 @@ class BedtimeRoutineReceiver : BroadcastReceiver() {
                         stopBedtimeRoutine()
 
                         // Reschedule bedtime tasks for next day
-                        ThreadUtils.runOnMainThread(1000L) {
-                            scheduleBedtimeRoutineTasks(
-                                context,
-                                jsonBedtimeSettings
-                            )
-                        }
+                        scheduleBedtimeRoutineTasks(
+                            context,
+                            jsonBedtimeSettings
+                        )
                     }
                 }
                 return Result.success()
@@ -116,6 +112,11 @@ class BedtimeRoutineReceiver : BroadcastReceiver() {
 
         private fun startBedtimeRoutine() {
             if (!canStartRoutineToday) return
+
+            // Update active and hard-lock states
+            SharedPrefsHelper.getSetIsBedtimeActive(context, true)
+            SharedPrefsHelper.getSetIsBedtimeHardLocked(context, bedtimeSchedule.isHardLockOn)
+
             trackerServiceConn.setOnConnectedCallback { service: MindfulTrackerService ->
                 with(service) {
                     getRestrictionManager.updateBedtimeApps(bedtimeSchedule.distractingApps)
@@ -134,6 +135,10 @@ class BedtimeRoutineReceiver : BroadcastReceiver() {
         }
 
         private fun stopBedtimeRoutine() {
+            // Update active and hard-lock states
+            SharedPrefsHelper.getSetIsBedtimeActive(context, false)
+            SharedPrefsHelper.getSetIsBedtimeHardLocked(context, false)
+
             trackerServiceConn.setOnConnectedCallback { service: MindfulTrackerService ->
                 service.getRestrictionManager.updateBedtimeApps(
                     null

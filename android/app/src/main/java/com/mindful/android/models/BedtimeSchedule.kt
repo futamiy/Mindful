@@ -35,6 +35,11 @@ data class BedtimeSchedule(
     val scheduleDays: List<Boolean> = listOf(true, true, true, true, true, false, false),
 
     /**
+     * Boolean indicating if the bedtime routine should be hard-locked when active.
+     */
+    val isHardLockOn: Boolean = false,
+
+    /**
      * Set of app package names identified as distracting apps.
      */
     val distractingApps: Set<String> = emptySet(),
@@ -46,6 +51,7 @@ data class BedtimeSchedule(
             val jsonObject = JSONObject(json)
             return BedtimeSchedule(
                 isScheduleOn = jsonObject.optBoolean("isScheduleOn", false),
+                isHardLockOn = jsonObject.optBoolean("isHardLockOn", false),
                 shouldStartDnd = jsonObject.optBoolean("shouldStartDnd", false),
                 scheduleStartTime = jsonObject.optInt("scheduleStartTime", 0),
                 scheduleDurationInMins = jsonObject.optInt("scheduleDurationInMins", 0),

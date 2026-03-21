@@ -87,6 +87,11 @@ class BedtimeScheduleNotifier extends StateNotifier<BedtimeSchedule> {
     state = state.copyWith(shouldStartDnd: shouldStartDnd);
   }
 
+  /// Enables or disables the Hard Lock during the Bedtime schedule.
+  /// If [TRUE], the user cannot deactivate the schedule while it is currently in progress.
+  void setHardLockOn(bool isHardLockOn) =>
+      state = state.copyWith(isHardLockOn: isHardLockOn);
+
   /// Adds or removes an app package from the list of distracting apps.
   ///
   /// If no distracting apps remain after removal and the schedule is active, it cancels the schedule.

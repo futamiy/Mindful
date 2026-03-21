@@ -72,6 +72,15 @@ class TabBedtime extends ConsumerWidget {
       return;
     }
 
+    /// If hard lock is on and trying to turn off while between schedule
+    if (state.isHardLockOn &&
+        state.isScheduleOn &&
+        !shouldStart &&
+        isBetweenSchedule) {
+      context.showSnackAlert(context.locale.bedtime_hard_lock_snack_alert);
+      return;
+    }
+
     ref
         .read(bedtimeScheduleProvider.notifier)
         .switchBedtimeSchedule(shouldStart);

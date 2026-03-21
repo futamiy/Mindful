@@ -33,6 +33,9 @@ class BedtimeQuickActions extends ConsumerWidget {
     final shouldStartDnd =
         ref.watch(bedtimeScheduleProvider.select((v) => v.shouldStartDnd));
 
+    final isHardLockOn =
+        ref.watch(bedtimeScheduleProvider.select((v) => v.isHardLockOn));
+
     final isScheduleOn =
         ref.watch(bedtimeScheduleProvider.select((v) => v.isScheduleOn));
 
@@ -50,6 +53,19 @@ class BedtimeQuickActions extends ConsumerWidget {
           onPressed: () => ref
               .read(bedtimeScheduleProvider.notifier)
               .setShouldStartDnd(!shouldStartDnd),
+        ),
+
+        /// Should hard lock
+        DefaultListTile(
+          position: ItemPosition.mid,
+          enabled: !isScheduleOn,
+          switchValue: isHardLockOn,
+          leadingIcon: FluentIcons.lock_closed_20_regular,
+          titleText: context.locale.hard_lock_tile_title,
+          subtitleText: context.locale.hard_lock_tile_subtitle,
+          onPressed: () => ref
+              .read(bedtimeScheduleProvider.notifier)
+              .setHardLockOn(!isHardLockOn),
         ),
 
         /// Manage Dnd settings

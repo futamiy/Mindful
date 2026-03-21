@@ -40,12 +40,14 @@ class DeviceFeaturesManager(
     companion object {
         /**
          * Checks if Device Settings features (Admin or Accessibility) are open for mindful.
+         * Also checks if the App Info page for Mindful is open to prevent force-stopping.
          */
         private fun isSettingsTamperFeatureOpen(
             context: Context,
             node: AccessibilityNodeInfo,
         ): Boolean {
             val appName: String = context.getString(R.string.app_name)
+            val packageName: String = context.packageName
 
             // Check for Admin section
             val isAdminSectionOpen =
@@ -60,7 +62,19 @@ class DeviceFeaturesManager(
                         node.findAccessibilityNodeInfosByText(appName)
                             .any { it.text == appName }
 
+            // Check for App Info page for Mindful
+            val isAppInfoPageOpen = node.packageName == SYSTEM_SETTINGS_PACKAGE &&
+                    node.findAccessibilityNodeInfosByText(appName).isNotEmpty()
 
+            val isBedtimeLocked = SharedPrefsHelper.getSetIsBedtimeActive(context, null) &&
+                    SharedPrefsHelper.getSetIsBedtimeHardLocked(context, null)
+
+            val isFocusActive = SharedPrefsHelper.getSetIsFocusActive(context, null)
+
+            if (isAppInfoPageOpen && (isBedtimeLocked || isFocusActive)) {
+                Log.d("Mindful.DeviceFeaturesManager", "isSettingsTamperFeatureOpen: Blocking App Info page during active session")
+                return true
+            }
 
             return (isAdminSectionOpen || isAccessibilitySectionOpen) &&
                     PermissionsHelper.getAndAskAdminPermission(context, false)

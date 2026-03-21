@@ -61,6 +61,7 @@ const defaultBedtimeScheduleModel = BedtimeSchedule(
   isScheduleOn: false,
   shouldStartDnd: false,
   distractingApps: [],
+  isHardLockOn: false,
 );
 
 NotificationSettings defaultNotificationSettingsModel = NotificationSettings(

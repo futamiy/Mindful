@@ -37,6 +37,9 @@ object SharedPrefsHelper {
     private var mListenablePrefs: SharedPreferences? = null
     private const val LISTENABLE_PREFS_BOX = "UniquePrefs"
     const val PREF_KEY_WELLBEING_SETTINGS: String = "wellBeingSettings"
+    const val PREF_KEY_IS_BEDTIME_ACTIVE: String = "isBedtimeActive"
+    const val PREF_KEY_IS_BEDTIME_HARD_LOCKED: String = "isBedtimeHardLocked"
+    const val PREF_KEY_IS_FOCUS_ACTIVE: String = "isFocusActive"
 
     private var mCrashLogPrefs: SharedPreferences? = null
     private const val CRASH_LOG_PREFS_BOX = "CrashLogPrefs"
@@ -110,6 +113,42 @@ object SharedPrefsHelper {
                 .apply()
             return Wellbeing.fromJson(jsonWellBeing)
         }
+    }
+
+    /**
+     * Gets or sets whether bedtime routine is active.
+     */
+    fun getSetIsBedtimeActive(context: Context, isActive: Boolean?): Boolean {
+        checkAndInitializeListenablePrefs(context)
+        isActive?.let {
+            mListenablePrefs!!.edit().putBoolean(PREF_KEY_IS_BEDTIME_ACTIVE, it).apply()
+            return it
+        }
+        return mListenablePrefs!!.getBoolean(PREF_KEY_IS_BEDTIME_ACTIVE, false)
+    }
+
+    /**
+     * Gets or sets whether bedtime routine is hard-locked.
+     */
+    fun getSetIsBedtimeHardLocked(context: Context, isLocked: Boolean?): Boolean {
+        checkAndInitializeListenablePrefs(context)
+        isLocked?.let {
+            mListenablePrefs!!.edit().putBoolean(PREF_KEY_IS_BEDTIME_HARD_LOCKED, it).apply()
+            return it
+        }
+        return mListenablePrefs!!.getBoolean(PREF_KEY_IS_BEDTIME_HARD_LOCKED, false)
+    }
+
+    /**
+     * Gets or sets whether focus session is active.
+     */
+    fun getSetIsFocusActive(context: Context, isActive: Boolean?): Boolean {
+        checkAndInitializeListenablePrefs(context)
+        isActive?.let {
+            mListenablePrefs!!.edit().putBoolean(PREF_KEY_IS_FOCUS_ACTIVE, it).apply()
+            return it
+        }
+        return mListenablePrefs!!.getBoolean(PREF_KEY_IS_FOCUS_ACTIVE, false)
     }
 
 

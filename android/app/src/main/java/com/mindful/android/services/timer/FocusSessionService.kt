@@ -86,6 +86,9 @@ class FocusSessionService : Service() {
             }
             mTrackerServiceConn.startAndBind()
 
+            // Update focus active state
+            SharedPrefsHelper.getSetIsFocusActive(this, true)
+
             // Toggle DND according to the session configurations
             if (focusSession.toggleDnd) NotificationHelper.toggleDnd(
                 this,
@@ -174,6 +177,9 @@ class FocusSessionService : Service() {
 
 
     override fun onDestroy() {
+        // Update focus active state
+        SharedPrefsHelper.getSetIsFocusActive(this, false)
+
         mTrackerServiceConn.service?.getRestrictionManager?.updateFocusedApps(null)
         mTrackerServiceConn.unBindService()
         stopForeground(STOP_FOREGROUND_REMOVE)

@@ -61,5 +61,9 @@ class BedtimeScheduleTable extends Table {
       .map(const StringListConverter())
       .withDefault(Constant(jsonEncode([])))();
 
+  /// Boolean denoting if to hard lock the bedtime schedule when it is active.
+  /// If [TRUE], the user cannot deactivate the schedule while it is currently in progress.
+  BoolColumn get isHardLockOn => boolean().withDefault(const Constant(false))();
+
   
 }
