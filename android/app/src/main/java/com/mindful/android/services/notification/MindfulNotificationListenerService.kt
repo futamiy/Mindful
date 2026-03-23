@@ -47,6 +47,12 @@ class MindfulNotificationListenerService : NotificationListenerService() {
     private var settings: NotificationSettings = NotificationSettings()
     private var isListenerActive = false
 
+    override fun onCreate() {
+        super.onCreate()
+        settings = SharedPrefsHelper.getSetNotificationSettings(this, null)
+        Log.d(TAG, "onCreate: Notification settings loaded: $settings")
+    }
+
     /**
      *  Returns the pending intent for the provided key if found, otherwise null
      */

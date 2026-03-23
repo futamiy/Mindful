@@ -1,5 +1,7 @@
 import 'package:mindful/core/database/adapters/time_of_day_adapter.dart';
 import 'package:mindful/core/database/app_database.dart';
+import 'package:mindful/core/enums/break_cycle.dart';
+import 'package:mindful/core/enums/break_reset_type.dart';
 import 'package:mindful/core/enums/default_home_tab.dart';
 import 'package:mindful/core/enums/recap_type.dart';
 import 'package:mindful/core/enums/reminder_type.dart';
@@ -96,6 +98,10 @@ const defaultAppRestrictionModel = AppRestriction(
   periodDurationInMins: 0,
   canAccessInternet: true,
   reminderType: ReminderType.toast,
+  resetType: BreakResetType.tomorrow,
+  resetCycle: BreakCycle.earlyNight,
+  resetCustomMins: 0,
+  isTransparentModeOn: false,
 );
 
 final defaultFocusModeModel = FocusMode(

@@ -13,6 +13,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindful/core/database/adapters/time_of_day_adapter.dart';
 import 'package:mindful/core/database/app_database.dart';
 import 'package:mindful/core/database/daos/dynamic_records_dao.dart';
+import 'package:mindful/core/enums/break_cycle.dart';
+import 'package:mindful/core/enums/break_reset_type.dart';
 import 'package:mindful/core/enums/reminder_type.dart';
 import 'package:mindful/core/services/drift_db_service.dart';
 import 'package:mindful/core/services/method_channel_service.dart';
@@ -129,6 +131,54 @@ class AppsRestrictionsNotifier
 
     /// Update database and state
     _updateStateDbAndServices(appPackage, restriction, updateVpn: true);
+  }
+
+  /// Updates the reset type for a specific app package.
+  void updateResetType(String appPackage, BreakResetType resetType) async {
+    final restriction = state[appPackage]?.copyWith(resetType: resetType) ??
+        defaultAppRestrictionModel.copyWith(
+          appPackage: appPackage,
+          resetType: resetType,
+        );
+
+    _updateStateDbAndServices(appPackage, restriction);
+  }
+
+  /// Updates the reset cycle for a specific app package.
+  void updateResetCycle(String appPackage, BreakCycle resetCycle) async {
+    final restriction = state[appPackage]?.copyWith(resetCycle: resetCycle) ??
+        defaultAppRestrictionModel.copyWith(
+          appPackage: appPackage,
+          resetCycle: resetCycle,
+        );
+
+    _updateStateDbAndServices(appPackage, restriction);
+  }
+
+  /// Updates the custom reset minutes for a specific app package.
+  void updateResetCustomMins(String appPackage, int mins) async {
+    final restriction = state[appPackage]?.copyWith(resetCustomMins: mins) ??
+        defaultAppRestrictionModel.copyWith(
+          appPackage: appPackage,
+          resetCustomMins: mins,
+        );
+
+    _updateStateDbAndServices(appPackage, restriction);
+  }
+
+  /// Toggles transparent mode for a specific app package.
+  void toggleTransparentMode(String appPackage) async {
+    final current = state[appPackage]?.isTransparentModeOn ??
+        defaultAppRestrictionModel.isTransparentModeOn;
+
+    final restriction =
+        state[appPackage]?.copyWith(isTransparentModeOn: !current) ??
+            defaultAppRestrictionModel.copyWith(
+              appPackage: appPackage,
+              isTransparentModeOn: !current,
+            );
+
+    _updateStateDbAndServices(appPackage, restriction);
   }
 
   /// Updates the id of associated [RestrictionGroup] for a specific app package.

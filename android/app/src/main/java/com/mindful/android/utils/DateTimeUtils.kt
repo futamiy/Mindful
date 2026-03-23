@@ -141,4 +141,55 @@ object DateTimeUtils {
         else (totalMinutesAbs / 60).toString() + "h " + totalMinutesAbs % 60 + "m"
         else totalMinutesAbs.toString() + "m"
     }
+
+    /**
+     * Calculates the start time in milliseconds for the current reset period.
+     *
+     * @param resetType 0: tomorrow (00:00), 1: cycle, 2: custom
+     * @param resetCycle 0: earlyNight (00:00), 1: morning (06:00), 2: afternoon (12:00), 3: evening (18:00)
+     * @param resetCustomMins custom break duration in minutes
+     * @return Start time in milliseconds.
+     */
+    fun calculateResetStartTime(resetType: Int, resetCycle: Int, resetCustomMins: Int): Long {
+        val cal = Calendar.getInstance()
+        val now = System.currentTimeMillis()
+
+        when (resetType) {
+            0 -> { // Tomorrow (00:00)
+                cal.set(Calendar.HOUR_OF_DAY, 0)
+                cal.set(Calendar.MINUTE, 0)
+                cal.set(Calendar.SECOND, 0)
+                cal.set(Calendar.MILLISECOND, 0)
+                if (cal.timeInMillis > now) {
+                    cal.add(Calendar.DAY_OF_YEAR, -1)
+                }
+            }
+            1 -> { // Cycle
+                val resetHour = when (resetCycle) {
+                    0 -> 0  // Early Night
+                    1 -> 6  // Morning
+                    2 -> 12 // Afternoon
+                    3 -> 18 // Evening
+                    else -> 0
+                }
+                cal.set(Calendar.HOUR_OF_DAY, resetHour)
+                cal.set(Calendar.MINUTE, 0)
+                cal.set(Calendar.SECOND, 0)
+                cal.set(Calendar.MILLISECOND, 0)
+                if (cal.timeInMillis > now) {
+                    cal.add(Calendar.DAY_OF_YEAR, -1)
+                }
+            }
+            2 -> { // Custom
+                val customStartTime = now - (resetCustomMins * 60 * 1000L)
+                // Cap at today's midnight (00:00) so it doesn't look back to yesterday
+                cal.set(Calendar.HOUR_OF_DAY, 0)
+                cal.set(Calendar.MINUTE, 0)
+                cal.set(Calendar.SECOND, 0)
+                cal.set(Calendar.MILLISECOND, 0)
+                return maxOf(customStartTime, cal.timeInMillis)
+            }
+        }
+        return cal.timeInMillis
+    }
 }

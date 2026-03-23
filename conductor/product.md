@@ -14,6 +14,8 @@ To provide the most robust and privacy-respecting toolset for anyone seeking to 
 - **Focus Mode:** Dedicated sessions for study, work, or creative tasks.
 - **Bedtime Parental Control:** Scheduled wind-down routine with a "Hard Lock" to prevent late-night bypass.
 - **Screen Time Limits:** Daily usage limits with "Invincible Mode" to lock restrictions.
+- **Flexible Reset Cycles:** App-specific reset times (Tomorrow, Scheduled Cycle, or Custom Break) for usage limits.
+- **Transparent Mode:** Apply restrictions selectively to specific apps without affecting system-wide behavior.
 - **Detailed Usage Insights:** Offline-first data visualization of screen time and app usage.
 - **Privacy-First & FOSS:** No ads, no tracking, completely offline, and open-source forever.
 

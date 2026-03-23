@@ -42,6 +42,26 @@ data class AppRestriction(
      * ID of the restriction group this app belongs to (nullable).
      */
     val associatedGroupId: Int? = null,
+
+    /**
+     * Type of reset for app timer and launch limit.
+     */
+    val resetType: Int = 0, // 0: tomorrow, 1: cycle, 2: custom
+
+    /**
+     * Cycle for app timer and launch limit reset.
+     */
+    val resetCycle: Int = 0, // 0: earlyNight, 1: morning, 2: afternoon, 3: evening
+
+    /**
+     * Custom reset time in minutes.
+     */
+    val resetCustomMins: Int = 0,
+
+    /**
+     * Flag denoting if transparent mode is ON for this app.
+     */
+    val isTransparentModeOn: Boolean = false,
 ) {
     companion object {
         /**
@@ -59,6 +79,10 @@ data class AppRestriction(
                 associatedGroupId = if (jsonObject.isNull("associatedGroupId")) null else jsonObject.optInt(
                     "associatedGroupId"
                 ),
+                resetType = jsonObject.optInt("resetType", 0),
+                resetCycle = jsonObject.optInt("resetCycle", 0),
+                resetCustomMins = jsonObject.optInt("resetCustomMins", 0),
+                isTransparentModeOn = jsonObject.optBoolean("isTransparentModeOn", false),
             )
         }
     }

@@ -11,6 +11,8 @@
 import 'package:drift/drift.dart';
 import 'package:mindful/core/database/adapters/time_of_day_adapter.dart';
 import 'package:mindful/core/database/app_database.dart';
+import 'package:mindful/core/enums/break_cycle.dart';
+import 'package:mindful/core/enums/break_reset_type.dart';
 import 'package:mindful/core/enums/reminder_type.dart';
 
 @DataClassName("AppRestriction")
@@ -54,4 +56,19 @@ class AppRestrictionTable extends Table {
   /// [ReminderType] Type of reminders to show when using timed app
   TextColumn get reminderType =>
       textEnum<ReminderType>().withDefault(Constant(ReminderType.toast.name))();
+
+  /// Type of reset for app timer and launch limit
+  IntColumn get resetType => intEnum<BreakResetType>()
+      .withDefault(Constant(BreakResetType.tomorrow.index))();
+
+  /// Cycle for app timer and launch limit reset
+  IntColumn get resetCycle => intEnum<BreakCycle>()
+      .withDefault(Constant(BreakCycle.earlyNight.index))();
+
+  /// Custom reset time in minutes
+  IntColumn get resetCustomMins => integer().withDefault(const Constant(0))();
+
+  /// Flag denoting if transparent mode is ON for this app
+  BoolColumn get isTransparentModeOn =>
+      boolean().withDefault(const Constant(false))();
 }

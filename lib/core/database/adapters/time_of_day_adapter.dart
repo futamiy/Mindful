@@ -26,7 +26,7 @@ class TimeOfDayAdapter extends TimeOfDay {
 
   const TimeOfDayAdapter.fromMinutes(int totalMinutes)
       : super(
-          hour: totalMinutes ~/ 60,
+          hour: (totalMinutes ~/ 60) % 24,
           minute: totalMinutes % 60,
         );
 

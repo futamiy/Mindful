@@ -16,6 +16,7 @@ import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.util.Log
 import com.mindful.android.enums.DndWakeLock
+import com.mindful.android.models.NotificationSettings
 import com.mindful.android.models.Wellbeing
 import com.mindful.android.utils.AppUtils
 import com.mindful.android.utils.JsonUtils
@@ -37,6 +38,7 @@ object SharedPrefsHelper {
     private var mListenablePrefs: SharedPreferences? = null
     private const val LISTENABLE_PREFS_BOX = "UniquePrefs"
     const val PREF_KEY_WELLBEING_SETTINGS: String = "wellBeingSettings"
+    const val PREF_KEY_NOTIFICATION_SETTINGS: String = "notificationSettings"
     const val PREF_KEY_IS_BEDTIME_ACTIVE: String = "isBedtimeActive"
     const val PREF_KEY_IS_BEDTIME_HARD_LOCKED: String = "isBedtimeHardLocked"
     const val PREF_KEY_IS_FOCUS_ACTIVE: String = "isFocusActive"
@@ -112,6 +114,27 @@ object SharedPrefsHelper {
             mListenablePrefs!!.edit().putString(PREF_KEY_WELLBEING_SETTINGS, jsonWellBeing)
                 .apply()
             return Wellbeing.fromJson(jsonWellBeing)
+        }
+    }
+
+    /**
+     * Fetches the notification settings if jsonNotificationSettings is null else store it's json.
+     *
+     * @param context               The application context.
+     * @param jsonNotificationSettings The JSON string of notification settings.
+     */
+    fun getSetNotificationSettings(
+        context: Context,
+        jsonNotificationSettings: String?,
+    ): NotificationSettings {
+        checkAndInitializeListenablePrefs(context)
+        if (jsonNotificationSettings == null) {
+            val json = mListenablePrefs!!.getString(PREF_KEY_NOTIFICATION_SETTINGS, "{}")!!
+            return NotificationSettings.fromJson(json)
+        } else {
+            mListenablePrefs!!.edit().putString(PREF_KEY_NOTIFICATION_SETTINGS, jsonNotificationSettings)
+                .apply()
+            return NotificationSettings.fromJson(jsonNotificationSettings)
         }
     }
 

@@ -96,10 +96,15 @@ extension ExtDateTime on DateTime {
 
   /// Returns TRUE if the [DateTime] lies between [start] and [end] else false.
   bool isBetweenTod(TimeOfDayAdapter start, TimeOfDayAdapter end) {
-    final startDt = dateOnly.add(start.toMinutes.minutes);
-    final endDt = dateOnly
-        .add(end.toMinutes.minutes)
-        .add(end.toMinutes < start.toMinutes ? 24.hours : 0.seconds);
-    return isBetween(startDt, endDt);
+    final nowMins = hour * 60 + minute;
+    final startMins = start.toMinutes;
+    final endMins = end.toMinutes;
+
+    if (startMins <= endMins) {
+      return nowMins >= startMins && nowMins < endMins;
+    } else {
+      // Crosses midnight
+      return nowMins >= startMins || nowMins < endMins;
+    }
   }
 }

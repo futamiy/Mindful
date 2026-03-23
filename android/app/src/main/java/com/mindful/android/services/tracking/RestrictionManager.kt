@@ -81,7 +81,20 @@ class RestrictionManager(
         // If already restricted by focus or bedtime or cached
         val alreadyRestrictedState = evaluateIfAlreadyRestricted(packageName)
         if (alreadyRestrictedState != null) {
-            return alreadyRestrictedState
+            // Check for transparent mode
+            val restriction = appsRestrictions[packageName]
+            if (restriction?.isTransparentModeOn == true) {
+                // If it's a focus or bedtime restriction, don't return it (transparent to system)
+                if (alreadyRestrictedState.type == RestrictionType.FOCUS ||
+                    alreadyRestrictedState.type == RestrictionType.BEDTIME
+                ) {
+                    // fall through to check app's own limits
+                } else {
+                    return alreadyRestrictedState
+                }
+            } else {
+                return alreadyRestrictedState
+            }
         }
 
         // If no restrictions
@@ -185,12 +198,23 @@ class RestrictionManager(
         restriction: AppRestriction,
         futureStates: MutableSet<RestrictionState>,
     ): RestrictionState? {
-        // Usage map
-        val screenUsage = ScreenUsageHelper.fetchAppUsageTodayTillNow(usageStatsManager)
+        // App's custom reset start time
+        val appResetStart = DateTimeUtils.calculateResetStartTime(
+            restriction.resetType,
+            restriction.resetCycle,
+            restriction.resetCustomMins
+        )
+
+        // Usage map for this app specifically based on its reset time
+        val appSpecificUsage = ScreenUsageHelper.fetchUsageForInterval(
+            usageStatsManager,
+            appResetStart,
+            System.currentTimeMillis()
+        )
 
         /// Check for app timer
         if (restriction.timerSec > 0) {
-            val screenTimeSec: Long = screenUsage[restriction.appPackage] ?: 0
+            val screenTimeSec: Long = appSpecificUsage[restriction.appPackage] ?: 0
 
             /// App timer ran out
             if (screenTimeSec >= restriction.timerSec) {
@@ -228,7 +252,14 @@ class RestrictionManager(
             }
 
             if (group.timerSec > 0) {
-                val groupScreenTimeSec = group.distractingApps.sumOf { screenUsage[it] ?: 0 }
+                // Group reset is still midnight (00:00)
+                val groupResetStart = DateTimeUtils.calculateResetStartTime(0, 0, 0)
+                val groupUsage = ScreenUsageHelper.fetchUsageForInterval(
+                    usageStatsManager,
+                    groupResetStart,
+                    System.currentTimeMillis()
+                )
+                val groupScreenTimeSec = group.distractingApps.sumOf { groupUsage[it] ?: 0 }
 
                 /// group timer ran out
                 if (groupScreenTimeSec >= group.timerSec) {

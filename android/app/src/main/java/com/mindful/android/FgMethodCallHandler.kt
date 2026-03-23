@@ -253,6 +253,9 @@ class FgMethodCallHandler(
                 val settingsJson = call.arguments() ?: ""
                 val settings = NotificationSettings.fromJson(settingsJson)
 
+                /// Store in shared prefs for persistence
+                SharedPrefsHelper.getSetNotificationSettings(context, settingsJson)
+
                 /// Update service
                 if (notificationServiceConn.isActive) {
                     notificationServiceConn.service?.updateNotificationSettings(settings)
